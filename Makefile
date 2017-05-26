@@ -2,7 +2,6 @@ CC=gcc
 
 BIN_DIR = ./bin
 OUT_DIR = ./out
-SRC_DIR = $(PWD)
 
 CFLAGS = -O3 -I. -I$(OUT_DIR)
 LFLAGS = -lm
@@ -31,7 +30,7 @@ $(OUT_DIR):
 	@mkdir $@
 
 test: all
-	@echo $(EXE_FILES) | replace "$(BIN_DIR)/" "" | replace ".exe" "" | xargs make 
+	@echo $(EXE_FILES) | sed 's|$(BIN_DIR)/||g' | sed 's|.exe||g' | xargs make 
 
 $(BIN_DIR)/fb1-1.exe: $(OUT_DIR)/fb1-1.lex
 	@echo -e "\E[34mbuild fb1-1 Unix的wc程序"
@@ -130,7 +129,7 @@ fb3-2: $(BIN_DIR)/fb3-2.exe
 	@tput sgr0
 	$? < fb3-2.exp
 
-$(OUT_DIR)/%.lex: $(SRC_DIR)/%.l
+$(OUT_DIR)/%.lex: %.l
 	@echo -e "\E[32m"$?"\E[m"
 	@tput sgr0
 	@flex -o$@.c $?
@@ -138,7 +137,7 @@ $(OUT_DIR)/%.lex: $(SRC_DIR)/%.l
 	@$(CC) $(CFLAGS) -E $@.c -o $@.e
 	@$(CC) $(CFLAGS) -c $@.c -o $@
 
-$(OUT_DIR)/%.yy: $(SRC_DIR)/%.y
+$(OUT_DIR)/%.yy: %.y
 	@echo -e "\E[32m"$?"\E[m"
 	@tput sgr0
 	@bison -v -d -y -o$@.c $?
@@ -146,7 +145,7 @@ $(OUT_DIR)/%.yy: $(SRC_DIR)/%.y
 	@$(CC) $(CFLAGS) -E $@.c -o $@.e
 	@$(CC) $(CFLAGS) -c $@.c -o $@
 
-$(OUT_DIR)/%.o: $(SRC_DIR)/%.c
+$(OUT_DIR)/%.o: %.c
 	@echo -e "\E[32m"$?"\E[m"
 	@tput sgr0
 	@$(CC) $(CFLAGS) -S $? -o $(@:.o=.s)
